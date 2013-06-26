@@ -40,7 +40,6 @@ db = new neo4j.GraphDatabase
 cypher = require 'cypher-query'
 
 cypher().start('n=node(*)').execute db, (err, res) ->
-# (returns `n` by default)
 
 # Or install as db.builder()
 cypher.install(db)

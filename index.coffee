@@ -33,10 +33,8 @@ class CypherQuery
 
   part_builder = (key) -> (vals...) ->
     @params vals.pop() unless isString vals[vals.length-1]
-
     unless @_query[key]? then @_query[key] = vals
     else @_query[key].push vals...
-
     this
 
   @::[k] = part_builder k for k in PARTS
@@ -50,6 +48,5 @@ class CypherQuery
       query = new CypherQuery opt
       query.execute = query.execute.bind query, this
       query
-
 
 module.exports = CypherQuery
