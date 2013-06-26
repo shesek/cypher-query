@@ -1,0 +1,28 @@
+{
+  "name": "cypher-query",
+  "version": "0.0.3",
+  "description": "Query builder for Cypher (tiny wrapper around string expressions)",
+  "scripts": {
+    "test": "mocha --compilers coffee:coffee-script test.coffee",
+    "prepublish": "coffee -c index.coffee"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shesek/cypher-query"
+  },
+  "keywords": [
+    "cypher",
+    "neo4j",
+    "query",
+    "builder"
+  ],
+  "author": "Nadav Ivgi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shesek/cypher-query/issues"
+  },
+  "devDependencies": {
+    "mocha": "~1.11.0",
+    "coffee-script": "~1.6.3"
+  }
+}
