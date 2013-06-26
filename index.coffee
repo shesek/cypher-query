@@ -1,38 +1,41 @@
 "use strict"
 
 isString = (val) -> typeof val is 'string'
+isArray = (val) -> typeof val is 'array'
 extend = (target, source) -> target[k]=v for k, v of source; target
 
 class CypherQuery
-  PARTS = [ 'start', 'match', 'where', 'with', 'return'
+  PARTS = [ 'start', 'match', 'where', 'with'
+            'set', 'delete', 'forach', 'return'
             'union', 'union all'
-            'order by', 'limit', 'skip', ]
+            'order by', 'limit', 'skip' ]
   
-  constructor: (parts) ->
-    return new CypherQuery parts unless this?
+  constructor: (opt) ->
+    return new CypherQuery opt unless this?
 
-    if parts?.params?
-      @params = parts.params
-      delete parts.params
-    else @params = {}
+    @_params = {}
+    @_query = {}
+    @[key] ([].concat val)... for key, val of opt  if opt?
 
-    @parts = if parts?
-      parts[key] = [ val ] for key, val of parts when isString val
-      parts
-    else {}
+  toString: ->
+    (for key in PARTS when (val = @_query[key])?
+      joiner = if key is 'where' then ' AND ' else ', '
+      key.toUpperCase() + ' ' + val.join joiner
+    ).join "\n"
 
-  execute: (db, cb) -> db.query @toString(), @params, cb
-  toString: -> compile @parts
+  execute: (db, cb) -> db.query @toString(), @_params, cb
 
-  set: (params) -> extend @params, params; this
-
-  part_builder = (key) -> (vals..., params) ->
+  params: (params) ->
     if params?
-      if isString params then vals.push params
-      else extend @params, params
+      extend @_params, params
+      this
+    else @_params
 
-    unless @parts[key]? then @parts[key] = vals
-    else @parts[key].push vals...
+  part_builder = (key) -> (vals...) ->
+    @params vals.pop() unless isString vals[vals.length-1]
+
+    unless @_query[key]? then @_query[key] = vals
+    else @_query[key].push vals...
 
     this
 
@@ -43,16 +46,10 @@ class CypherQuery
   autoindex: (expr, params) -> @index 'node:node_auto_index', expr, params
 
   @install: (target = require 'neo4j/lib/GrpahDatabase') ->
-    target::builder= (parts) ->
-      query = new CypherQuery parts
+    target::builder= (opt) ->
+      query = new CypherQuery opt
       query.execute = query.execute.bind query, this
       query
 
-  @compile: compile = (parts) ->
-    parts.return ?= [ 'n' ]
-    (for key in PARTS when (val = parts[key])?
-      joiner = if key is 'where' then ' AND ' else ', '
-      key.toUpperCase() + ' ' + val.join joiner
-    ).join "\n"
 
 module.exports = CypherQuery

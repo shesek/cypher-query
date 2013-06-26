@@ -17,7 +17,7 @@ query = cypher()
   .start('n = node(*)')
   .where('n.name = {name}', name: 'Joe')
   .where('n.age > {age}')
-  .set(age: 22)
+  .params(age: 22)
   .return('n.email', 'n.age')
 
 # Alternative API
@@ -31,6 +31,8 @@ query = cypher
 query.toString() # START n=node(*)
                  # WHERE n.name = 'Joe' AND n.age > 22
                  # RETURN n.email, n.age
+# Use params() to get all the collected params
+query.params() # { name: 'Joe', age: 22 }
 ```
 #### With [thingdom/node-neo4j](https://github.com/thingdom/node-neo4j)
 ```coffee

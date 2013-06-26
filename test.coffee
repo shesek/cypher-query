@@ -1,5 +1,5 @@
 cypher = require './index.coffee'
-{ equal: eq, deepEqual: deepEq } = assert = require 'assert'
+{ equal: eq, deepEqual: deepEq, ok } = require 'assert'
 
 describe 'CypherQuery', ->
   it 'works', ->
@@ -19,31 +19,28 @@ describe 'CypherQuery', ->
   it 'uses the correct order', ->
     eq cypher().return('a').start('b').toString(), "START b\nRETURN a"
 
-  it 'returns "n" by default', ->
-    eq cypher().start('n=node(8)').toString(), "START n=node(8)\nRETURN n"
-  
-  it 'takes optional parts object in cypher()', ->
+  it 'takes optional query object in cypher()', ->
     query = cypher(
       start: 'a'
       match: [ 'b', 'c' ]
       params: { d: 4 }
     ).where('d')
+    
     eq query.toString(),
       """
       START a
       MATCH b, c
       WHERE d
-      RETURN n
       """
-    deepEq query.params, d: 4
+    deepEq query.params(), d: 4
 
   it 'collects the params', ->
     query = cypher()
       .start('n', n: 1)
       .where('foo={bar}', bar: 'bar')
       .where('baz={qux}', qux: 'qux')
-      .set(corge: 'corge')
-    deepEq query.params, n: 1, bar: 'bar', qux: 'qux', corge: 'corge'
+      .params(corge: 'corge')
+    deepEq query.params(), n: 1, bar: 'bar', qux: 'qux', corge: 'corge'
 
   it 'executes the call on the database', (done) ->
     db = query: (query, params, cb) ->
@@ -56,10 +53,12 @@ describe 'CypherQuery', ->
       done()
 
   it 'can be installed to GraphDatabase::builder()', (done) ->
-    class Graph then query: (query, params, cb) -> cb query, params
+    class Graph then query: (query, params, cb) -> cb null, query, params
     cypher.install Graph
-    assert Graph::builder?
-    (new Graph).builder().start('a').execute (query) ->
-      eq query, "START a\nRETURN n"
+    ok Graph::builder?
+    (new Graph).builder().start('a').execute (err, query, params) ->
+      ok not err?
+      eq query, "START a"
+      deepEq params, {}
       done()
 
