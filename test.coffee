@@ -40,7 +40,9 @@ describe 'CypherQuery', ->
       .where('foo={bar}', bar: 'bar')
       .where('baz={qux}', qux: 'qux')
       .params(corge: 'corge')
-    deepEq query.params(), n: 1, bar: 'bar', qux: 'qux', corge: 'corge'
+      .params('hello', 'world')
+    deepEq query.params(), n: 1, bar: 'bar', qux: 'qux', corge: 'corge', hello: 'world'
+
 
   it 'executes the call on the database', (done) ->
     db = query: (query, params, cb) ->

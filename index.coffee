@@ -25,8 +25,11 @@ class CypherQuery
 
   execute: (db, cb) -> db.query @toString(), @_params, cb
 
-  params: (params) ->
-    if params?
+  params: (params, val) ->
+    if val?
+      @_params[params] = val
+      this
+    else if params?
       extend @_params, params
       this
     else @_params

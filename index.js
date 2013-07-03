@@ -62,8 +62,11 @@
       return db.query(this.toString(), this._params, cb);
     };
 
-    CypherQuery.prototype.params = function(params) {
-      if (params != null) {
+    CypherQuery.prototype.params = function(params, val) {
+      if (val != null) {
+        this._params[params] = val;
+        return this;
+      } else if (params != null) {
         extend(this._params, params);
         return this;
       } else {
