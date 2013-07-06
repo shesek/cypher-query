@@ -43,7 +43,6 @@ describe 'CypherQuery', ->
       .params('hello', 'world')
     deepEq query.params(), n: 1, bar: 'bar', qux: 'qux', corge: 'corge', hello: 'world'
 
-
   it 'executes the call on the database', (done) ->
     db = query: (query, params, cb) ->
       eq query, "START a\nRETURN b"
@@ -63,4 +62,26 @@ describe 'CypherQuery', ->
       eq query, "START a"
       deepEq params, {}
       done()
+
+  describe '::compile(with_params)', ->
+    it 'delegates to toString() when with_params=false', ->
+      eq cypher().start('a').compile(), "START a"
+
+    it 'replaces the params placeholder when with_params=true', ->
+      query = cypher().start('a=node({id})', id: 3).where('a.foo={foo}', foo: 'fo"o')
+      eq query.compile(true), 'START a=node(3)\nWHERE a.foo="fo""o"'
+
+  describe '.escape(string)', -> it 'escapes strings', ->
+    eq (cypher.escape 'hello " world ""'), '"hello "" world """""'
+
+  describe '.escape_identifier(identifier)', ->
+    it 'escapes identifiers with invalid characters', ->
+      eq (cypher.escape_identifier 'some ^` name'), '`some ^`` name`'
+
+    it 'escapes reserved names', ->
+      eq (cypher.escape_identifier 'where'), '`where`'
+    
+    it 'leaves valid identifiers as-is', ->
+      eq (cypher.escape_identifier 'hello'), 'hello'
+
 
