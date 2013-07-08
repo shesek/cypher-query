@@ -51,7 +51,7 @@ class CypherQuery
 
   autoindex: (expr, params) -> @index 'node:node_auto_index', expr, params
 
-  @install: (target = require 'neo4j/lib/GrpahDatabase') ->
+  @install: (target = require 'neo4j/lib/GraphDatabase') ->
     target::builder = (opt) ->
       query = new CypherQuery opt
       query.execute = query.execute.bind query, this
