@@ -40,6 +40,7 @@ class CypherQuery
     else @_params
 
   part_builder = (key) -> (vals...) ->
+    return @_query[key] unless vals.length
     @params vals.pop() unless typeof vals[vals.length-1] is 'string'
     unless @_query[key]? then @_query[key] = vals
     else @_query[key].push vals...

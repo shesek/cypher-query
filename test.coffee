@@ -19,6 +19,11 @@ describe 'CypherQuery', ->
   it 'uses the correct order', ->
     eq cypher().return('a').start('b').toString(), "START b\nRETURN a"
 
+  it 'returns the current query parts when no value is provided', ->
+    query = cypher(start:'n=node(*)').return('n').return('a')
+    deepEq query.start(), [ 'n=node(*)' ]
+    deepEq query.return(), [ 'n', 'a']
+
   it 'takes optional query object in cypher()', ->
     query = cypher(
       start: 'a'

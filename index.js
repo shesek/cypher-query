@@ -88,6 +88,9 @@
       return function() {
         var vals, _ref;
         vals = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        if (!vals.length) {
+          return this._query[key];
+        }
         if (typeof vals[vals.length - 1] !== 'string') {
           this.params(vals.pop());
         }
@@ -115,7 +118,7 @@
 
     CypherQuery.install = function(target) {
       if (target == null) {
-        target = require('neo4j/lib/GrpahDatabase');
+        target = require('neo4j/lib/GraphDatabase');
       }
       return target.prototype.builder = function(opt) {
         var query;
