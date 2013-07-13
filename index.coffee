@@ -47,6 +47,7 @@ class CypherQuery
     this
 
   @::[k] = part_builder k for k in QUERY_PARTS
+  ret: @::return
 
   index: (index, expr, params) -> @start "n=#{index}(#{expr})", params
 
