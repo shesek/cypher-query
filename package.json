@@ -3,7 +3,7 @@
   "version": "0.0.9",
   "description": "Query builder for Cypher (tiny wrapper around string expressions)",
   "scripts": {
-    "test": "mocha --compilers coffee:coffee-script test.coffee",
+    "test": "mocha",
     "prepublish": "coffee -c index.coffee"
   },
   "repository": {
