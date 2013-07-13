@@ -64,6 +64,9 @@ cypher.escape 'hello " world!' # "hello "" world!"
 
 # Escape identifiers
 cypher.escape_identifier 'some ` identifier' # `some `` identifier`
+
+# Build the MATCH pattern arrow string
+cypher.pattern type: 'knows', direction: 'out' # -[:knows]->
 ```
 
 ### License
