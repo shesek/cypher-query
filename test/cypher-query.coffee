@@ -1,4 +1,4 @@
-cypher = require './index.coffee'
+cypher = require '../index.coffee'
 { equal: eq, deepEqual: deepEq, ok } = require 'assert'
 
 describe 'CypherQuery', ->
@@ -68,6 +68,9 @@ describe 'CypherQuery', ->
       deepEq params, {}
       done()
 
+  it 'aliases return as ret', ->
+    eq cypher::return, cypher::ret
+
   describe '::compile(with_params)', ->
     it 'delegates to toString() when with_params=false', ->
       eq cypher().start('a').compile(), "START a"
@@ -80,13 +83,31 @@ describe 'CypherQuery', ->
     eq (cypher.escape 'hello " world ""'), '"hello "" world """""'
 
   describe '.escape_identifier(identifier)', ->
+    { escape_identifier } = cypher
     it 'escapes identifiers with invalid characters', ->
-      eq (cypher.escape_identifier 'some ^` name'), '`some ^`` name`'
+      eq '`some `` name`', escape_identifier 'some ` name'
 
     it 'escapes reserved names', ->
-      eq (cypher.escape_identifier 'where'), '`where`'
+      eq '`where`', escape_identifier 'where'
     
     it 'leaves valid identifiers as-is', ->
-      eq (cypher.escape_identifier 'hello'), 'hello'
+      eq 'hello', escape_identifier 'hello'
 
+  describe '.pattern({ type, direction, alias })', ->
+    { pattern } = cypher
 
+    it 'works with all directions', ->
+      eq '-->', pattern direction: 'out'
+      eq '<--', pattern direction: 'in'
+      eq '--',  pattern direction: 'all'
+
+    it 'allows to specify the type and alias', ->
+      eq '<-[:knows]-', pattern direction: 'in', type: 'knows'
+      eq '-[r]->',      pattern direction: 'out', alias: 'r'
+      eq '-[r:knows]-', pattern direction: 'all', alias: 'r', type: 'knows'
+
+    it 'defaults to both directions', ->
+      eq '-[r]-', pattern alias: 'r'
+
+    it 'escapes properly', ->
+      eq '-[`some spaces`:````]->', pattern direction: 'out', alias: 'some spaces', type: '`'

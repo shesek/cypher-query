@@ -64,9 +64,22 @@ class CypherQuery
     when 'number' then val
     else '"' + ((''+val).replace /"/g, '""') + '"'
 
-  @escape_identifier: (name) ->
+  @escape_identifier: escape_identifier = (name) ->
     if name.toLowerCase() in RESERVED or INVALID_IDEN.test name
       '`' + (name.replace '`', '``') + '`'
     else name
+
+  @pattern: do (patterns = out: '-%s->', in: '<-%s-', all: '-%s-') ->
+    ({ type, direction, alias, optional }) ->
+      rel_str = if type? or alias? or optional
+        '[' + \
+        (if alias? then escape_identifier alias else '') + \
+        (if optional then '?' else '') + \
+        (if type? then ':' + escape_identifier type else '') + \
+        ']'
+      else ''
+
+      (patterns[direction or 'all'] or throw new Error 'Invalid direction')
+        .replace('%s', rel_str)
 
 module.exports = CypherQuery

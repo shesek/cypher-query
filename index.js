@@ -21,7 +21,7 @@
   QUERY_PARTS = ['start', 'match', 'where', 'with', 'set', 'delete', 'forach', 'return', 'union', 'union all', 'order by', 'limit', 'skip'];
 
   CypherQuery = (function() {
-    var escape, k, part_builder, _i, _len;
+    var escape, escape_identifier, k, part_builder, _i, _len;
 
     function CypherQuery(opt) {
       var key, val;
@@ -108,6 +108,8 @@
       CypherQuery.prototype[k] = part_builder(k);
     }
 
+    CypherQuery.prototype.ret = CypherQuery.prototype["return"];
+
     CypherQuery.prototype.index = function(index, expr, params) {
       return this.start("n=" + index + "(" + expr + ")", params);
     };
@@ -141,7 +143,7 @@
       }
     };
 
-    CypherQuery.escape_identifier = function(name) {
+    CypherQuery.escape_identifier = escape_identifier = function(name) {
       var _ref;
       if ((_ref = name.toLowerCase(), __indexOf.call(RESERVED, _ref) >= 0) || INVALID_IDEN.test(name)) {
         return '`' + (name.replace('`', '``')) + '`';
@@ -149,6 +151,21 @@
         return name;
       }
     };
+
+    CypherQuery.pattern = (function(patterns) {
+      return function(_arg) {
+        var alias, direction, optional, rel_str, type;
+        type = _arg.type, direction = _arg.direction, alias = _arg.alias, optional = _arg.optional;
+        rel_str = (type != null) || (alias != null) || optional ? '[' + (alias != null ? escape_identifier(alias) : '') + (optional ? '?' : '') + (type != null ? ':' + escape_identifier(type) : '') + ']' : '';
+        return (patterns[direction || 'all'] || (function() {
+          throw new Error('Invalid direction');
+        })()).replace('%s', rel_str);
+      };
+    })({
+      out: '-%s->',
+      "in": '<-%s-',
+      all: '-%s-'
+    });
 
     return CypherQuery;
 
