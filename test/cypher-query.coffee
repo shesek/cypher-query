@@ -109,5 +109,8 @@ describe 'CypherQuery', ->
     it 'defaults to both directions', ->
       eq '-[r]-', pattern alias: 'r'
 
+    it 'supports optional relations', ->
+      eq '-[r?:knows]-', pattern optional: true, alias: 'r', type: 'knows'
+
     it 'escapes properly', ->
       eq '-[`some spaces`:````]->', pattern direction: 'out', alias: 'some spaces', type: '`'
