@@ -152,11 +152,11 @@
       }
     };
 
-    CypherQuery.pattern = (function(patterns) {
+    CypherQuery.pattern = (function(patterns, length_re) {
       return function(_arg) {
-        var alias, direction, optional, rel_str, type;
-        type = _arg.type, direction = _arg.direction, alias = _arg.alias, optional = _arg.optional;
-        rel_str = (type != null) || (alias != null) || optional ? '[' + (alias != null ? escape_identifier(alias) : '') + (optional ? '?' : '') + (type != null ? ':' + escape_identifier(type) : '') + ']' : '';
+        var alias, direction, length, optional, rel_str, type;
+        type = _arg.type, direction = _arg.direction, alias = _arg.alias, optional = _arg.optional, length = _arg.length;
+        rel_str = (type != null) || (alias != null) || optional ? '[' + (alias != null ? escape_identifier(alias) : '') + (optional ? '?' : '') + (type != null ? ':' + escape_identifier(type) : '') + ((length != null) && (length_re.test(length)) ? '*' + length : '') + ']' : '';
         return (patterns[direction || 'all'] || (function() {
           throw new Error('Invalid direction');
         })()).replace('%s', rel_str);
@@ -165,7 +165,7 @@
       out: '-%s->',
       "in": '<-%s-',
       all: '-%s-'
-    });
+    }, /^(?:\d+)?(?:\.\.)?(?:\d+)?$/);
 
     return CypherQuery;
 

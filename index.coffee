@@ -69,13 +69,17 @@ class CypherQuery
       '`' + (name.replace '`', '``') + '`'
     else name
 
-  @pattern: do (patterns = out: '-%s->', in: '<-%s-', all: '-%s-') ->
-    ({ type, direction, alias, optional }) ->
+  @pattern: do (
+    patterns = out: '-%s->', in: '<-%s-', all: '-%s-'
+    length_re = /^(?:\d+)?(?:\.\.)?(?:\d+)?$/
+  ) ->
+    ({ type, direction, alias, optional, length }) ->
       rel_str = if type? or alias? or optional
         '[' + \
         (if alias? then escape_identifier alias else '') + \
         (if optional then '?' else '') + \
         (if type? then ':' + escape_identifier type else '') + \
+        (if length? and (length_re.test length) then '*' + length else '') + \
         ']'
       else ''
 

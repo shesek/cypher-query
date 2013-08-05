@@ -112,5 +112,8 @@ describe 'CypherQuery', ->
     it 'supports optional relations', ->
       eq '-[r?:knows]-', pattern optional: true, alias: 'r', type: 'knows'
 
+    it 'supports path length', ->
+      eq '-[r?:knows*1..4]-', pattern optional: true, alias: 'r', type: 'knows', length: '1..4'
+
     it 'escapes properly', ->
       eq '-[`some spaces`:````]->', pattern direction: 'out', alias: 'some spaces', type: '`'
