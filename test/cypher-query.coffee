@@ -71,6 +71,9 @@ describe 'CypherQuery', ->
   it 'aliases return as ret', ->
     eq cypher::return, cypher::ret
 
+  it 'aliases "order by" as orderBy', ->
+    eq cypher::['order by'], cypher::orderBy
+
   describe '::compile(with_params)', ->
     it 'delegates to toString() when with_params=false', ->
       eq cypher().start('a').compile(), "START a"

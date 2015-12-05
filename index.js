@@ -110,6 +110,8 @@
 
     CypherQuery.prototype.ret = CypherQuery.prototype["return"];
 
+    CypherQuery.prototype.orderBy = CypherQuery.prototype['order by'];
+
     CypherQuery.prototype.index = function(index, expr, params) {
       return this.start("n=" + index + "(" + expr + ")", params);
     };
